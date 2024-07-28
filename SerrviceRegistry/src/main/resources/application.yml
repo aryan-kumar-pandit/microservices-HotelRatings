@@ -7,3 +7,7 @@ eureka:
 server:
   port: 8761
 
+spring:
+  application:
+    name: Service-Registry
+
