@@ -5,6 +5,7 @@ import com.user.service.entities.Hotel;
 import com.user.service.entities.Rating;
 import com.user.service.entities.User;
 import com.user.service.exception.ResourceNotFoundException;
+import com.user.service.external.services.HotelService;
 import com.user.service.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,8 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     @Autowired
     private RestTemplate restTemplate;
+    @Autowired
+    private HotelService hotelService;
 
     private Logger logger= LoggerFactory.getLogger(UserServiceImpl.class);
     @Override
@@ -46,7 +49,7 @@ public class UserServiceImpl implements UserService {
 
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("user with given id not found"));
         //fetch ratings from RatingService by using user
-        Rating[] ratingsOfUsers = restTemplate.getForObject("http://localhost:8083/ratings/users/"+user.getUserId(), Rating[].class );
+        Rating[] ratingsOfUsers = restTemplate.getForObject("http://RATING/ratings/users/"+user.getUserId(), Rating[].class );
         List<Rating> ratings = Arrays.stream(ratingsOfUsers).toList();
         logger.info("{}",ratingsOfUsers);
 
@@ -55,9 +58,12 @@ public class UserServiceImpl implements UserService {
             //set the hotel to rating
             //return the rating
             //http://localhost:8082/hotels/cdf98d6a-3761-4e23-b7ed-1d88b4ccdf28
-            ResponseEntity<Hotel> forEntity = restTemplate.getForEntity("http://localhost:8082/hotels/"+rating.getHotelId(), Hotel.class);
-            logger.info("Status code : {}",forEntity.getStatusCode());
-            Hotel hotel = forEntity.getBody();
+
+           // ResponseEntity<Hotel> forEntity = restTemplate.getForEntity("http://HOTELSERVICE/hotels/"+rating.getHotelId(), Hotel.class);
+           // logger.info("Status code : {}",forEntity.getStatusCode());
+            //Hotel hotel = forEntity.getBody();
+
+            Hotel hotel = hotelService.getHotel(rating.getHotelId());
             rating.setHotel(hotel);
             return rating;
         }).collect(Collectors.toList());
