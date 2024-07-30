@@ -11,7 +11,7 @@
 	<groupId>com.serviceRegistry</groupId>
 	<artifactId>SerrviceRegistry</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>SerrviceRegistry</name>
+	<name>ServiceRegistry</name>
 	<description>This project implements service registry</description>
 	<url/>
 	<licenses>
