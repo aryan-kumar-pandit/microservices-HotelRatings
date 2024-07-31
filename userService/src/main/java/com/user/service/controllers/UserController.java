@@ -3,6 +3,7 @@ package com.user.service.controllers;
 import com.user.service.entities.User;
 import com.user.service.services.UserService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +32,8 @@ public class UserController {
     int retryCount=1;
     @GetMapping("/{userId}")
     //@CircuitBreaker(name = "ratingHotelBreaker",fallbackMethod = "ratingHotelFallback")
-    @Retry(name = "ratingHotelService",fallbackMethod ="ratingHotelFallback")
+    //@Retry(name = "ratingHotelService",fallbackMethod ="ratingHotelFallback")
+    @RateLimiter(name = "userRateLimiter",fallbackMethod = "ratingHotelFallback")
     public ResponseEntity<User> getSingleUser(@PathVariable String userId)
     {
         logger.info("Retry count :{}",retryCount);
@@ -44,7 +46,7 @@ public class UserController {
     {
         logger.info("Fallback is executed because service is down :{}",ex.getMessage());
         User user = User.builder().email("dummy@emmail").name("dummy").about("this user is dummy").userId("1234").build();
-        return new ResponseEntity<>(user,HttpStatus.OK);
+        return new ResponseEntity<>(user,HttpStatus.NOT_FOUND);
     }
 
     @GetMapping
